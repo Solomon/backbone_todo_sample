@@ -126,7 +126,6 @@ $(function(){
     // Toggle the `"done"` state of the model.
     toggleDone: function() {
       this.model.toggle();
-      console.log(this.model);
     },
 
     // Switch this view into `"editing"` mode, displaying the input field.
