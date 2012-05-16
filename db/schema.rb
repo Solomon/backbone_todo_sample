@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120503163045) do
+ActiveRecord::Schema.define(:version => 20120515200740) do
 
   create_table "todos", :force => true do |t|
     t.text     "content"
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(:version => 20120503163045) do
     t.boolean  "done"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.datetime "due_date"
   end
 
 end

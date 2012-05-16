@@ -17,6 +17,7 @@ $(function(){
       return {
         content: "empty todo...",
         order: Todos.nextOrder(),
+        due_date: new Date(),
         done: false
       };
     },
@@ -40,6 +41,12 @@ $(function(){
     // Remove this Todo from *localStorage* and delete its view.
     clear: function() {
       this.destroy();
+    },
+
+    format_due_date: function() {
+      var formatted_date = new Date(parseInt(this.get('due_date').substr(6)));
+      console.log(formatted_date);
+      return formatted_date.toDateString();
     }
 
   });
@@ -114,10 +121,13 @@ $(function(){
       this.model.bind('change', this.render, this);
       this.model.bind('destroy', this.remove, this);
     },
-
+    
     // Re-render the contents of the todo item.
     render: function() {
-      this.$el.html(this.template(this.model.toJSON()));
+      var todo_json = this.model.toJSON();
+      console.log(todo_json.due_date);
+      todo_json.formatted_date = this.model.format_due_date();
+      this.$el.html(this.template(todo_json));
       this.$el.toggleClass('done', this.model.get('done'));
       this.input = this.$('.edit');
       return this;
@@ -150,7 +160,7 @@ $(function(){
     // Remove the item, destroy the model.
     clear: function() {
       this.model.clear();
-    }
+    }    
 
   });
 
@@ -246,5 +256,5 @@ $(function(){
   });
 
   // Finally, we kick things off by creating the **App**.
-  var App = new AppView;
+  var App = new AppView;  
 });
