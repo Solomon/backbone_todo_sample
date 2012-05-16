@@ -44,9 +44,23 @@ $(function(){
     },
 
     format_due_date: function() {
-      var formatted_date = new Date(parseInt(this.get('due_date').substr(6)));
-      console.log(formatted_date);
-      return formatted_date.toDateString();
+      var date_to_format = this.get('due_date');
+      // Check if the date is in the format we get from the rails api if so parse the date
+      if (typeof date_to_format == "string") {
+        var pattern = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/;
+        var match = pattern.exec(date_to_format);
+        if (!match) {throw new Error('::Error, could not parse date');}
+        var formatted_date = new Date(match[1], match[2]-1, match[3], match[4], match[5], match[6]);
+      }
+      // check to see if the date is in the date format when it is created with a default date
+      else if (date_to_format.getMonth()) {
+        var formatted_date = date_to_format;
+      }
+      else {
+        throw new Error('::Error, strange date format not found in format_due_date function');
+      }
+      var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+      return monthNames[formatted_date.getMonth()] + ' ' + formatted_date.getDate();
     }
 
   });
@@ -125,7 +139,6 @@ $(function(){
     // Re-render the contents of the todo item.
     render: function() {
       var todo_json = this.model.toJSON();
-      console.log(todo_json.due_date);
       todo_json.formatted_date = this.model.format_due_date();
       this.$el.html(this.template(todo_json));
       this.$el.toggleClass('done', this.model.get('done'));
