@@ -122,10 +122,13 @@ $(function(){
     // The DOM events specific to an item.
     events: {
       "click .toggle"   : "toggleDone",
-      "dblclick .view"  : "edit",
+      "dblclick .todo_content"  : "edit",
       "click a.destroy" : "clear",
       "keypress .edit"  : "updateOnEnter",
-      "blur .edit"      : "close"
+      "blur .edit"      : "close",
+      "dblclick .todo_date" : "editDate",
+      "keypress .edit_date" : "updateDateOnEnter",
+      "blur .edit_date" : "closeDate"
     },
 
     // The TodoView listens for changes to its model, re-rendering. Since there's
@@ -154,20 +157,34 @@ $(function(){
     // Switch this view into `"editing"` mode, displaying the input field.
     edit: function() {
       this.$el.addClass("editing");
-      this.input.focus();
+      this.$('.edit').focus();
+    },
+
+    editDate: function() {
+      console.log(this.$el);
+      this.$el.addClass("editing_date");
+      this.$('.edit_date').focus();
     },
 
     // Close the `"editing"` mode, saving changes to the todo.
     close: function() {
-      var value = this.input.val();
+      var value = this.$('.edit').val();
       if (!value) this.clear();
       this.model.save({content: value});
       this.$el.removeClass("editing");
     },
 
+    closeDate: function() {
+      console.log("close date function called");
+    },
+
     // If you hit `enter`, we're through editing the item.
     updateOnEnter: function(e) {
       if (e.keyCode == 13) this.close();
+    },
+
+    updateDateOnEnter: function(e) {
+      console.log("updateDateOnEnter function called");
     },
 
     // Remove the item, destroy the model.

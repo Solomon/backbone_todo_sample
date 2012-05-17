@@ -37,11 +37,12 @@
   <script type="text/template" id="item-template">
     <div class="view">
       <input class="toggle" type="checkbox" <%%= done ? 'checked="checked"' : '' %> />
-      <label><%%= content %></label>
-      <%%= formatted_date %>
+      <span class="todo_content"><%%= content %></span>
+      <span class="todo_date"><%%= formatted_date %></span>
       <a class="destroy"></a>
     </div>
     <input class="edit" type="text" value="<%%= content %>" />
+    <input class="edit_date" type="text" value="<%%= formatted_date %>" />
   </script>
 
   <script type="text/template" id="stats-template">
