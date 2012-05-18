@@ -17,7 +17,7 @@ $(function(){
       return {
         content: "empty todo...",
         order: Todos.nextOrder(),
-        due_date: new Date(),
+        due_date: "2013-12-31T12:00:00Z",
         done: false
       };
     },
@@ -26,6 +26,9 @@ $(function(){
     initialize: function() {
       if (!this.get("content")) {
         this.set({"content": this.defaults().content});
+      }
+      if (!this.get("due_date")) {
+        this.set({"due_date": this.defaults().due_date});
       }
     },
 
@@ -44,6 +47,7 @@ $(function(){
     },
 
     format_due_date: function() {
+      console.log('2');
       var date_to_format = this.get('due_date');
       // Check if the date is in the format we get from the rails api if so parse the date
       if (typeof date_to_format == "string") {
@@ -57,10 +61,31 @@ $(function(){
         var formatted_date = date_to_format;
       }
       else {
+        console.log(date_to_format);
         throw new Error('::Error, strange date format not found in format_due_date function');
       }
       var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
       return monthNames[formatted_date.getMonth()] + ' ' + formatted_date.getDate();
+    },
+
+    format_due_date_for_datepicker: function() {
+      var date_to_format = this.get('due_date');
+      // Check if the date is in the format we get from the rails api if so parse the date
+      if (typeof date_to_format == "string") {
+        var pattern = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/;
+        var match = pattern.exec(date_to_format);
+        if (!match) {throw new Error('::Error, could not parse date');}
+        var formatted_date = new Date(match[1], match[2]-1, match[3], match[4], match[5], match[6]);
+      }
+      // check to see if the date is in the date format when it is created with a default date
+      else if (date_to_format.getMonth()) {
+        var formatted_date = date_to_format;
+      }
+      else {
+        console.log(date_to_format);
+        throw new Error('::Error, strange date format not found in format_due_date function');
+      }      
+      return formatted_date.getMonth() + '/' + formatted_date.getDate() + '/' + formatted_date.getYear();
     }
 
   });
@@ -143,6 +168,7 @@ $(function(){
     render: function() {
       var todo_json = this.model.toJSON();
       todo_json.formatted_date = this.model.format_due_date();
+      todo_json.format_due_date_for_datepicker = this.model.format_due_date_for_datepicker();
       this.$el.html(this.template(todo_json));
       this.$el.toggleClass('done', this.model.get('done'));
       this.input = this.$('.edit');
@@ -161,8 +187,8 @@ $(function(){
     },
 
     editDate: function() {
-      console.log(this.$el);
       this.$el.addClass("editing_date");
+      this.$('.edit_date').datepicker();
       this.$('.edit_date').focus();
     },
 
@@ -175,7 +201,14 @@ $(function(){
     },
 
     closeDate: function() {
-      console.log("close date function called");
+      var date_input = this.$('.edit_date').val();
+      console.log(date_input);
+      var sp = date_input.split("/");
+      var month = sp[0] - 1;
+      var d = new Date(sp[2],month,sp[1],0,0,0);
+      console.log(sp[2] + " " + month + " " + sp[1]);
+      // this.model.save({due_date: d});
+      this.$el.removeClass("editing_date");
     },
 
     // If you hit `enter`, we're through editing the item.
@@ -184,7 +217,7 @@ $(function(){
     },
 
     updateDateOnEnter: function(e) {
-      console.log("updateDateOnEnter function called");
+      if (e.keyCode == 13) this.closeDate();
     },
 
     // Remove the item, destroy the model.
@@ -286,5 +319,6 @@ $(function(){
   });
 
   // Finally, we kick things off by creating the **App**.
-  var App = new AppView;  
+  var App = new AppView;
+
 });

@@ -23,7 +23,6 @@
   <div id="instructions">
     Double-click to edit a todo.
   </div>
-  
   <div id="credits">
     Created by
     <br />
@@ -42,7 +41,7 @@
       <a class="destroy"></a>
     </div>
     <input class="edit" type="text" value="<%%= content %>" />
-    <input class="edit_date" type="text" value="<%%= formatted_date %>" />
+    <input class="edit_date" type="text" value="<%%= format_due_date_for_datepicker %>" />
   </script>
 
   <script type="text/template" id="stats-template">
