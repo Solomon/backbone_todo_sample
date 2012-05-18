@@ -17,7 +17,7 @@ $(function(){
       return {
         content: "empty todo...",
         order: Todos.nextOrder(),
-        due_date: "2013-12-31T12:00:00Z",
+        due_date: Todos.tomorrow(),
         done: false
       };
     },
@@ -47,7 +47,6 @@ $(function(){
     },
 
     format_due_date: function() {
-      console.log('2');
       var date_to_format = this.get('due_date');
       // Check if the date is in the format we get from the rails api if so parse the date
       if (typeof date_to_format == "string") {
@@ -61,7 +60,6 @@ $(function(){
         var formatted_date = date_to_format;
       }
       else {
-        console.log(date_to_format);
         throw new Error('::Error, strange date format not found in format_due_date function');
       }
       var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
@@ -82,10 +80,9 @@ $(function(){
         var formatted_date = date_to_format;
       }
       else {
-        console.log(date_to_format);
         throw new Error('::Error, strange date format not found in format_due_date function');
-      }      
-      return formatted_date.getMonth() + '/' + formatted_date.getDate() + '/' + formatted_date.getYear();
+      }
+      return (formatted_date.getMonth() + 1 ) + '/' + formatted_date.getDate() + '/' + formatted_date.getFullYear();
     }
 
   });
@@ -121,6 +118,11 @@ $(function(){
       return this.last().get('order') + 1;
     },
 
+    tomorrow: function() {
+      var today = new Date();
+      var tomorrow = new Date(today.getTime() + (60*60*24*1000));
+      return tomorrow;
+    },
 
     // Todos are sorted by their original insertion order.
     comparator: function(todo) {
@@ -163,7 +165,7 @@ $(function(){
       this.model.bind('change', this.render, this);
       this.model.bind('destroy', this.remove, this);
     },
-    
+
     // Re-render the contents of the todo item.
     render: function() {
       var todo_json = this.model.toJSON();
@@ -188,7 +190,7 @@ $(function(){
 
     editDate: function() {
       this.$el.addClass("editing_date");
-      this.$('.edit_date').datepicker();
+      // this.$('.edit_date').datepicker();
       this.$('.edit_date').focus();
     },
 
@@ -202,12 +204,9 @@ $(function(){
 
     closeDate: function() {
       var date_input = this.$('.edit_date').val();
-      console.log(date_input);
       var sp = date_input.split("/");
-      var month = sp[0] - 1;
-      var d = new Date(sp[2],month,sp[1],0,0,0);
-      console.log(sp[2] + " " + month + " " + sp[1]);
-      // this.model.save({due_date: d});
+      var d = new Date(sp[2],sp[0] - 1,sp[1],0,0,0);
+      this.model.save({due_date: d});
       this.$el.removeClass("editing_date");
     },
 
@@ -223,7 +222,7 @@ $(function(){
     // Remove the item, destroy the model.
     clear: function() {
       this.model.clear();
-    }    
+    }
 
   });
 
